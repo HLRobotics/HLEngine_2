@@ -1,4 +1,4 @@
-#HL_Engine_2
+#HLEngine_2
 #Designed and Developed by
 #Akhil P Jacob
 import os
@@ -101,7 +101,7 @@ class Advanced_Image_Processing:
 
                 # cv2.cv.putText(cv2.cv.fromarray(img),str(id),(x,y+h),font,255)
                 cv2.putText(img, str(id), (x, y + h), font, 2, (255, 0, 0), 3);
-            cv2.imshow('HLEngine', img)
+            cv2.imshow('HLEngine_2', img)
             if (cv2.waitKey(1) == ord('q')):
                 break;
         cam.release()
@@ -118,7 +118,7 @@ class Audio_Processing:
         try:
             playsound(self.location)
         except:
-            return ("HLEngine:an issue in playing sound detected")
+            return ("HLEngine_2:an issue in playing sound detected")
 
 
     def saveAudio(self):
@@ -128,7 +128,7 @@ class Audio_Processing:
             myobj = gTTS(text=mytext, lang=language, slow=False)
             myobj.save(self.location)
         except:
-            return ("HLEngine:saveAudio issue detected")
+            return ("HLEngine_2:saveAudio issue detected")
 
 
     def playAudio(self):
@@ -139,7 +139,7 @@ class Audio_Processing:
             pygame.mixer.music.play()
             pygame.event.wait()
         except:
-            return ("HLEngine:playAudio issue detected")
+            return ("HLEngine_2:playAudio issue detected")
 
     def readText(self):
         try:
@@ -149,7 +149,7 @@ class Audio_Processing:
             engine.say(self.param)
             engine.runAndWait()
         except:
-            return ("HLEngine cannot load the required necessay files")
+            return ("HLEngine_2 cannot load the required necessay files")
 
 
     def readTextSpec(self):
@@ -180,7 +180,7 @@ class Audio_Processing:
 
         except:
 
-            return("HLEngine: An error occured in readAudioSpec")
+            return("HLEngine_2: An error occured in readAudioSpec")
 
 class Cipher:
 
@@ -408,9 +408,9 @@ class Communications:
             ser = serial.Serial(self.port, self.rate)
             time.sleep(2)
             ser.write(str.encode(str(self.data)))        
-            return('HLEngine:data sent...')
+            return('HLEngine_2:data sent...')
         except:
-            return ("HLEngine:issue with the  port")
+            return ("HLEngine_2:issue with the  port")
 
     def serRecieve(self):
         try:
@@ -418,33 +418,33 @@ class Communications:
             Serial_data = ser.readline()
             return (Serial_data)
         except:
-            return ("HLEngine:issue with the  port")
+            return ("HLEngine_2:issue with the  port")
 
 class System_Control:
     def shutDown_windows():
         try:
             os.system("shutdown /s /t 1")
         except:
-            return ("HLEngine :failed to shutdown windows")
+            return ("HLEngine_2 :failed to shutdown windows")
 
 
     def reboot_windows():
         try:
             os.system("restart /s /t 1")
         except:
-            return ("HLEngine :failed to reboot windows")
+            return ("HLEngine_2 :failed to reboot windows")
 
     def linux_shutdown():
         try:
             os.system("poweroff")
         except:
-            return ("HLEngine :failed to shutdown linux")
+            return ("HLEngine_2 :failed to shutdown linux")
 
     def linux_boot():
         try:
             os.system("reboot")
         except:
-            return ("HLEngine :failed to reboot linux")
+            return ("HLEngine_2 :failed to reboot linux")
     
 class Draw:
     def draw_Line(x,y,name,ycontent,xcontent):
@@ -492,7 +492,7 @@ class Image_Processing:
             camera.release()
             cv2.destroyAllWindows()
         except:
-            return ("HLEngine:Camera not connected")
+            return ("HLEngine_2:Camera not connected")
 
     def showImage(self):
         img = cv2.imread(self.location)
@@ -544,7 +544,7 @@ class Image_Processing:
             cap.release()
             cv2.destroyAllWindows()
         except:
-            return ("HLEngine: An issue with camera or params")
+            return ("HLEngine_2: An issue with camera or params")
 
 class Image_Overlay:
     def __init__(self,dress_png,person_png,final_png):
@@ -571,7 +571,7 @@ class Image_Overlay:
             return ('done')
 
         except:
-            return('HLEngine:An issue with the camera or params passed')    
+            return('HLEngine_2:An issue with the camera or params passed')    
     
 class Speech_Recognition_Tool:
     def sR():
@@ -581,26 +581,31 @@ class Speech_Recognition_Tool:
                 print("Say something!")
                 audio = r.listen(source)
             try:
-                print("HLEngine:You said: " + r.recognize_google(audio))
+                print("HLEngine_2:You said: " + r.recognize_google(audio))
                 content = r.recognize_google(audio)
                 return(content)
 
             except sr.UnknownValueError:
-                return ("HLEngine:Google Speech Recognition could not understand audio")
+                return ("HLEngine_2:Google Speech Recognition could not understand audio")
 
 
             except sr.RequestError as e:
-                return ("HLEngine:Could not request results from Google Speech Recognition service; {0}".format(e))
+                return ("HLEngine_2:Could not request results from Google Speech Recognition service; {0}".format(e))
         except:
 
-            return ('HLEngine:microphone not connected')
+            return ('HLEngine_2:microphone not connected | Check pyAudio is Installed (pipwin install PyAudio for windows)')
 
-    def sentiment(param):
+class Sentimental_Analysis:
+
+    def __init__(self,param):
+        self.param=param
+
+    def sentiment(self):
         import nltk
         # import TextBlob
         from textblob import TextBlob
-        blob1 = TextBlob(param)
-        return (blob1.sentiment.polarity)
+        blob1 = TextBlob(self.param)
+        return (blob1.sentiment.polarity)    
 
 class WIKI:
 
@@ -611,7 +616,7 @@ class WIKI:
         try:
             return(wikipedia.summary(self.word))
         except:
-            return ("HLEngine:error in executing wiki....")
+            return ("HLEngine_2:error in executing wiki....")
 
 class WordExtractor:    
     try:
@@ -626,7 +631,7 @@ class WordExtractor:
                 #print(first, last)
                 return(first,middle,last)
             except:
-                return("HLEngine:Error in excuting FW.....")
+                return("HLEngine_2:Error in excuting FW.....")
 
     except:
-        print("HLEngine: Please Enter the Correct Parameters")
+        print("HLEngine_2: Please Enter the Correct Parameters")
