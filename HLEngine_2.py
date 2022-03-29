@@ -18,9 +18,7 @@ from matplotlib import style
 import cv2
 import os
 import speech_recognition as sr
-import pyowm
 import wikipedia
-import base64
 from xml.dom import minidom
 
 recognizer=cv2.face.LBPHFaceRecognizer_create()
@@ -604,43 +602,6 @@ class Speech_Recognition_Tool:
         blob1 = TextBlob(param)
         return (blob1.sentiment.polarity)
 
-class Weather_Station:
-    def __init__(self,place):
-        self.place=place
-
-    def temp(self):
-        owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(self.place)
-        weather = observation.get_weather()
-        temperature=str(weather.get_temperature('celsius')['temp'])
-        return (temperature)
-
-    def sunrise(self):
-        owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(self.place)
-        weather = observation.get_weather()
-        sunriseTime=str(weather.get_sunrise_time(timeformat='iso'))
-        return (sunriseTime)
-
-    def sunset(self):
-        owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(self.place)
-        weather = observation.get_weather()
-        sunsetTime=weather.get_sunset_time(timeformat='iso')
-        return (sunsetTime)
-
-    def humidity(self):
-        owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(self.place)
-        weather = observation.get_weather()
-        return (weather.get_humidity())
-
-    def wind(self):
-        owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(self.place)
-        weather = observation.get_weather()
-        return (weather.get_wind())
-
 class WIKI:
 
     def __init__(self,word):
@@ -652,58 +613,20 @@ class WIKI:
         except:
             return ("HLEngine:error in executing wiki....")
 
-class WordExtractor:
+class WordExtractor:    
+    try:
 
-    def __init__(self,param,location):
-        self.param=param
-        self.location=location
+        def __init__(self,param):
+            self.param=param        
 
-    def FW(self):
-        try:
-            sent=str(self.param)
-            first, *middle, last = sent.split()
-            #print(first, last)
-            return(first)
-        except:
-            return("HLEngine:Error in excuting FW.....")
+        def Extract_Words(self):
+            try:
+                sent=str(self.param)
+                first, middle, last = sent.split()
+                #print(first, last)
+                return(first,middle,last)
+            except:
+                return("HLEngine:Error in excuting FW.....")
 
-    def EW(self):
-        try:
-            sent=str(self.param)
-            first, *middle, last = sent.split()
-            #print(first, last)
-            return(last)
-        except:
-            return ("HLEngine:error in executing EW....")
-
-    def Image_decode(self):
-        try:
-            from PIL import Image, ImageEnhance, ImageFilter
-            import pytesseract
-            import os
-            path = self.location
-            img = Image.open(path)
-            img = img.convert('RGBA')
-            pix = img.load()
-            text = pytesseract.image_to_string(Image.open(path))
-            #os.remove('temp.jpg')
-            return (text)
-        except:
-            return ("HLEngine:File missing...contact HLadmin")
-
-class XML_Parser:
-
-    def __init__(self,question):
-        self.question=question
-        
-    def sysArch(self):
-        mydoc = minidom.parse('HL_HiveMind/HL_HiveMind_Hub.xml')
-        sources = mydoc.getElementsByTagName('source')
-        first, *middle, last = self.question.split()
-        for elem in sources:
-            x = elem.firstChild.data
-            if (x == str(last)):
-                checker = int(elem.attributes['name'].value)
-                ans = (sources[checker].firstChild.data)
-                print("HLEngine:"+ans)
-                return(str(ans))
+    except:
+        print("HLEngine: Please Enter the Correct Parameters")
