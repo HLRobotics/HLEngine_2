@@ -29,10 +29,18 @@ rate=9600
 cap = cv2.VideoCapture(0)
 
 class Advanced_Image_Processing:
-    def collectDataSet(filterName,Cam,TargetID):
-        faceDetect = cv2.CascadeClassifier(filterName)
-        cam = cv2.VideoCapture(Cam)
-        id =TargetID
+
+    def __init_(self,filterName,Camera,TargetID,userList):
+        self.filterName=filterName
+        self.Camera=Camera
+        self.TargetID=TargetID
+        self.userList=userList
+        self.Dataset_path="dataset"
+
+    def collectDataSet(self):
+        faceDetect = cv2.CascadeClassifier(self.filterName)
+        cam = cv2.VideoCapture(self.Camera)
+        id =self.TargetID
         sampleNum = 0
         while (True):
             ret, img = cam.read();
@@ -52,7 +60,7 @@ class Advanced_Image_Processing:
         cv2.destroyAllWindows()
 
 
-    def trainDataSet():
+    def trainDataSet(self):
         def getImageWithID(path):
             imagePaths = [os.path.join(path, f) for f in os.listdir(path)]
             faces = []
@@ -67,16 +75,15 @@ class Advanced_Image_Processing:
                 cv2.waitKey(10)
             return np.array(IDs), faces
 
-        Ids, faces = getImageWithID(path)
+        Ids, faces = getImageWithID(self.Dataset_path)
         recognizer.train(faces, np.array(Ids))
         recognizer.save('recognizer/trainingdata.yml')
         cv2.destroyAllWindows()
 
 
-    def lockTarget_IP(filterName,ip,user1,user2,user3,user4,user5):
-        faceDetect = cv2.CascadeClassifier(filterName)
-        #camera="http://192.168.1.202:8080/video"
-        cam = cv2.VideoCapture(ip)
+    def lockTarget_Camera(self):
+        faceDetect = cv2.CascadeClassifier(self.filterName)    
+        cam = cv2.VideoCapture(self.Camera)
         rec = cv2.face.LBPHFaceRecognizer_create();
         rec.read('recognizer/trainingdata.yml')
         # id=0
@@ -89,62 +96,14 @@ class Advanced_Image_Processing:
             for (x, y, w, h) in faces:
                 cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 id, conf = rec.predict(gray[y:y + h, x:x + w])
-                # if(<50):
-                if (id == 1):
-                    id = user1
-                elif (id == 2):
-                    id = user2
-                elif (id == 3):
-                    id = user3
-                elif (id == 4):
-                    id = user4
-                elif (id == 5):
-                    id = user5
+                for Target in self.userList:
+                    ID=self.userList.index(Target)
+                    if(ID==id):
+                        print(Target,conf)
 
-                else:
-                    id = 'unknown'
                 # cv2.cv.putText(cv2.cv.fromarray(img),str(id),(x,y+h),font,255)
                 cv2.putText(img, str(id), (x, y + h), font, 2, (255, 0, 0), 3);
-            cv2.imshow('face', img)
-            if (cv2.waitKey(1) == ord('q')):
-                break;
-        cam.release()
-        cv2.destroyAllWindows()
-
-
-
-    def lockTarget_Camera(filterName,camera,user1,user2,user3,user4,user5):
-        faceDetect = cv2.CascadeClassifier(filterName)    
-        cam = cv2.VideoCapture(camera)
-        rec = cv2.face.LBPHFaceRecognizer_create();
-        rec.read('recognizer/trainingdata.yml')
-        # id=0
-        # font=cv2.cv.InitFont(cv2.cv.CV_FONT_HERSHEY_COMPLEX_SMALL,5,1,0,4)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        while (True):
-            ret, img = cam.read();
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            faces = faceDetect.detectMultiScale(gray, 1.3, 5);
-            for (x, y, w, h) in faces:
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                id, conf = rec.predict(gray[y:y + h, x:x + w])
-                # if(<50):
-                if (id == 1):
-                    id = user1
-                elif (id == 2):
-                    id = user2
-                elif (id == 3):
-                    id = user3
-                elif (id == 4):
-                    id = user4
-                elif (id == 5):
-                    id = user5
-
-                else:
-                    id = 'unknown'
-                # cv2.cv.putText(cv2.cv.fromarray(img),str(id),(x,y+h),font,255)
-                cv2.putText(img, str(id), (x, y + h), font, 2, (255, 0, 0), 3);
-            cv2.imshow('face', img)
+            cv2.imshow('HLEngine', img)
             if (cv2.waitKey(1) == ord('q')):
                 break;
         cam.release()
@@ -152,45 +111,50 @@ class Advanced_Image_Processing:
 
 class Audio_Processing:
 
-    def soundPlayer(location):
+    def __init__(self,param,location):
+        self.param=param
+        self.location=location
+
+
+    def soundPlayer(self):
         try:
-            playsound(location)
+            playsound(self.location)
         except:
             return ("HLEngine:an issue in playing sound detected")
 
 
-    def saveAudio(param,location):
+    def saveAudio(self):
         try:
-            mytext = param
+            mytext = self.param
             language = 'en'
             myobj = gTTS(text=mytext, lang=language, slow=False)
-            myobj.save(location)
+            myobj.save(self.location)
         except:
             return ("HLEngine:saveAudio issue detected")
 
 
-    def playAudio(location):
+    def playAudio(self):
         try:
             pygame.init()
             pygame.mixer.init()
-            pygame.mixer.music.load(location)
+            pygame.mixer.music.load(self.location)
             pygame.mixer.music.play()
             pygame.event.wait()
         except:
             return ("HLEngine:playAudio issue detected")
 
-    def readText(param):
+    def readText(self):
         try:
             engine = pyttsx3.init()
             engine.getProperty('rate')
             engine.setProperty('rate', 125)
-            engine.say(param)
+            engine.say(self.param)
             engine.runAndWait()
         except:
             return ("HLEngine cannot load the required necessay files")
 
 
-    def readTextSpec(param):
+    def readTextSpec(self):
         try:
 
 
@@ -212,7 +176,7 @@ class Audio_Processing:
             engine.setProperty('voice', voices[1].id)  # changing index, changes voices. 1 for female
 
 
-            engine.say(param + str(rate))
+            engine.say(self.param + str(rate))
             engine.runAndWait()
             engine.stop()
 
@@ -221,7 +185,13 @@ class Audio_Processing:
             return("HLEngine: An error occured in readAudioSpec")
 
 class Cipher:
-    def dataEncryption(data):
+
+    def __init__(self,enc,dec):
+        self.toEncrypt=enc
+        self.toDecrypt=dec
+
+
+    def dataEncryption(self):
         keyLoader=open('HL_Engine\HL_Crypto\key.txt','r')
         key=keyLoader.read()
         dataModel=[]
@@ -230,7 +200,7 @@ class Cipher:
             dataModel.append(i)
         keyModel=str(key)
         Position_Generator=[]
-        Data=str(data)
+        Data=str(self.toEncrypt)
         for i in Data:
             #print(i)
             if(i in Data):
@@ -245,13 +215,13 @@ class Cipher:
         return(encrypted)
 
 
-    def dataDecryption(data):
-        data=str(data)
+    def dataDecryption(self):
+        data=str(self.toDecrypt)
         dataModel=[]
         ASCER=(string.printable)
         for i in ASCER:
             dataModel.append(i)
-        keyLoader=open('HL_Crypto/key.txt','r')
+        keyLoader=open('HL_Engine\HL_Crypto\key.txt','r')
         key=keyLoader.read()
         keyModel=str(key)
         decrypt=[]
@@ -269,16 +239,23 @@ class Cipher:
         return(decrypted)
 
 class Communications:
-    def find_Port():
+
+    def __init__(self,port,rate,data):
+        self.port=port
+        self.rate=rate
+        self.data=data
+
+
+    def find_Port(self):
         try:
-            ser = serial.Serial("COM1", rate)
+            ser = serial.Serial("COM1", self.rate)
             print("Connected to COM1")
             return('COM1')
         except:
             print("Disconnected to COM1")
         
         try:
-            ser = serial.Serial("COM2", rate)
+            ser = serial.Serial("COM2", self.rate)
             print("Connected to COM2")
             return('COM2')
         except:
@@ -286,7 +263,7 @@ class Communications:
 
         
         try:
-            ser = serial.Serial("COM3", rate)
+            ser = serial.Serial("COM3", self.rate)
             print("Connected to COM3")
             return('COM3')
         except:
@@ -294,21 +271,21 @@ class Communications:
 
 
         try:
-            ser = serial.Serial("COM4", rate)
+            ser = serial.Serial("COM4", self.rate)
             print("Connected to COM4")
             return('COM4')
         except:
             print("Disconnected to COM4")
 
         try:
-            ser = serial.Serial("COM5", rate)
+            ser = serial.Serial("COM5", self.rate)
             print("Connected to COM5")
             return('COM5')
         except:
             print("Disconnected to COM5")
 
         try:
-            ser = serial.Serial("COM6", rate)
+            ser = serial.Serial("COM6", self.rate)
             print("Connected to COM6")
             return('COM6')
         except:
@@ -316,136 +293,136 @@ class Communications:
 
 
         try:
-            ser = serial.Serial("COM7", rate)
+            ser = serial.Serial("COM7", self.rate)
             print("Connected to COM7")
             return('COM7')
         except:
             print("Disconnected to COM7")
 
         try:
-            ser = serial.Serial("COM8", rate)
+            ser = serial.Serial("COM8", self.rate)
             print("Connected to COM8")
             return('COM8')
         except:
             print("Disconnected to COM8")
 
         try:
-            ser = serial.Serial("COM9", rate)
+            ser = serial.Serial("COM9", self.rate)
             print("Connected to COM9")
             return('COM9')
         except:
             print("Disconnected to COM9")
 
         try:
-            ser = serial.Serial("COM10", rate)
+            ser = serial.Serial("COM10", self.rate)
             print("Connected to COM10")
             return('COM10')
         except:
             print("Disconnected to COM10")
 
         try:
-            ser = serial.Serial("COM11", rate)
+            ser = serial.Serial("COM11", self.rate)
             print("Connected to COM11")
             return('COM11')
         except:
             print("Disconnected to COM11")
 
         try:
-            ser = serial.Serial("COM12", rate)
+            ser = serial.Serial("COM12", self.rate)
             print("Connected to COM12")
             return('COM12')
         except:
             print("Disconnected to COM12")
 
         try:
-            ser = serial.Serial("COM13", rate)
+            ser = serial.Serial("COM13", self.rate)
             print("Connected to COM13")
             return('COM13')
         except:
             print("Disconnected to COM13")
 
         try:
-            ser = serial.Serial("COM14", rate)
+            ser = serial.Serial("COM14", self.rate)
             print("Connected to COM14")
             return('COM14')
         except:
             print("Disconnected to COM14")
 
         try:
-            ser = serial.Serial("COM15", rate)
+            ser = serial.Serial("COM15", self.rate)
             print("Connected to COM15")
             return('COM15')
         except:
             print("Disconnected to COM15")
 
         try:
-            ser = serial.Serial("COM16", rate)
+            ser = serial.Serial("COM16", self.rate)
             print("Connected to COM16")
             return('COM16')
         except:
             print("Disconnected to COM16")
 
         try:
-            ser = serial.Serial("COM17", rate)
+            ser = serial.Serial("COM17", self.rate)
             print("Connected to COM17")
             return('COM17')
         except:
             print("Disconnected to COM17")
 
         try:
-            ser = serial.Serial("COM18", rate)
+            ser = serial.Serial("COM18", self.rate)
             print("Connected to COM18")
             return('COM18')
         except:
             print("Disconnected to COM18")
 
         try:
-            ser = serial.Serial("COM19", rate)
+            ser = serial.Serial("COM19", self.rate)
             print("Connected to COM19")
             return('COM19')
         except:
             print("Disconnected to COM19")
 
         try:
-            ser = serial.Serial("COM20", rate)
+            ser = serial.Serial("COM20", self.rate)
             print("Connected to COM20")
             return('COM20')
         except:
             print("Disconnected to COM20")
 
         try:
-            ser = serial.Serial("/dev/ttyUSB0", rate)
+            ser = serial.Serial("/dev/ttyUSB0", self.rate)
             print("Connected to /dev/ttyUSB0")
             return('/dev/ttyUSB0')
         except:
             print("Disconnected to /dev/ttyUSB0")
 
         try:
-            ser = serial.Serial("/dev/ttyACM0", rate)
+            ser = serial.Serial("/dev/ttyACM0", self.rate)
             print("Connected to /dev/ttyACM0")
             return('/dev/ttyACM0')
         except:
             print("Disconnected to /dev/ttyACM0")
 
 
-    def serSend(port,rate,data):
+    def serSend(self):
         try:
-            ser = serial.Serial(port, rate)
+            ser = serial.Serial(self.port, self.rate)
             time.sleep(2)
-            ser.write(str.encode(str(data)))        
+            ser.write(str.encode(str(self.data)))        
             return('HLEngine:data sent...')
         except:
             return ("HLEngine:issue with the  port")
 
-    def serRecieve(port,rate):
+    def serRecieve(self):
         try:
-            ser = serial.Serial(port, rate)
+            ser = serial.Serial(self.port, self.rate)
             Serial_data = ser.readline()
             return (Serial_data)
         except:
             return ("HLEngine:issue with the  port")
 
-
+class System_Control:
     def shutDown_windows():
         try:
             os.system("shutdown /s /t 1")
@@ -470,7 +447,7 @@ class Communications:
             os.system("reboot")
         except:
             return ("HLEngine :failed to reboot linux")
-
+    
 class Draw:
     def draw_Line(x,y,name,ycontent,xcontent):
         plt.plot(x,y)#[1,2],[3,4]
@@ -498,35 +475,41 @@ class Draw:
         plt.show()
 
 class Image_Processing:
-    def camSnap(location,frameName,cam):
+
+    def __init__(self,location,frameName,camera):
+        self.location=location
+        self.frameName=frameName
+        self.camera=camera
+
+    def camSnap(self):
         try:
-            camera = cv2.VideoCapture(cam)
+            camera = cv2.VideoCapture(self.camera)
             while True:
                 return_value, image = camera.read()
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                cv2.imshow(frameName, gray)
+                cv2.imshow(self.frameName, gray)
                 if cv2.waitKey(1) & 0xFF == ord('x'):
-                    cv2.imwrite(location, gray)
+                    cv2.imwrite(self.location, gray)
                     break
             camera.release()
             cv2.destroyAllWindows()
         except:
             return ("HLEngine:Camera not connected")
 
-    def showImage(location,frameName):
-        img = cv2.imread(location)
-        cv2.imshow(frameName, img)
+    def showImage(self):
+        img = cv2.imread(self.location)
+        cv2.imshow(self.frameName, img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
 
-    def liveCam_filter(filter,cam,frameName):
+    def liveCam_filter(self):
         try:
-            cap = cv2.VideoCapture(cam)
+            cap = cv2.VideoCapture(self.camera)
 
             # Create the haar cascade
             faceCascade = cv2.CascadeClassifier(filter)
-            framer=frameName
+            framer=self.frameName
             while (True):
 
                 # Capture frame-by-frame
@@ -565,64 +548,19 @@ class Image_Processing:
         except:
             return ("HLEngine: An issue with camera or params")
 
-    def videoObjectDetection(cascade,video_source,frameName,objectName):
+class Image_Overlay:
+    def __init__(self,dress_png,person_png,final_png):
+        self.dress_png=dress_png
+        self.person_png=person_png
+        self.final_png=final_png
+
+    def overlay(self):
         try:
-            cap = cv2.VideoCapture(video_source)
-
-            # Create the haar cascade
-            faceCascade = cv2.CascadeClassifier(cascade)
-            framer=frameName
-            font = cv2.FONT_HERSHEY_PLAIN
-            while (True):
-
-                # Capture frame-by-frame
-                ret, frame = cap.read()
-
-                # Our operations on the frame come here
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-                # Detect faces in the image
-                net = faceCascade.detectMultiScale(
-                    gray,
-                    scaleFactor=1.1,
-                    minNeighbors=5,
-                    minSize=(30, 30)
-                    # flags = cv2.CV_HAAR_SCALE_IMAGEHL_Engine/HLEngine_camSnap.py:40
-                )
-
-                #print(format(len(net)))
-                # print (len(faces))
-                if (len(net) >= 1):
-                    #return ("found 2 eyes")
-                    cv2.putText(frame, str(objectName), (50, 50), font, 2,
-                                (0, 0, 255), 3)
-
-
-
-                # Draw a rectangle around the faces
-                for (x, y, w, h) in net:
-                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-                # Display the resulting frame
-                cv2.imshow(framer, frame)
-                if cv2.waitKey(1) & 0xFF == ord('x'):
-                    break
-
-
-            # When everything done, release the capture
-            cap.release()
-            cv2.destroyAllWindows()
-        except:
-            return ("HLEngine: An issue with video_source or params")
-
-
-    def overlay(dress_png,person_png,finalName_png):
-        try:
-            img = Image.open(dress_png)
+            img = Image.open(self.dress_png)
 
             #print(img.size)
 
-            background = Image.open(person_png)
+            background = Image.open(self.person_png)
 
             #print(background.size)
 
@@ -631,12 +569,12 @@ class Image_Processing:
             background = background.resize(size,Image.ANTIALIAS)
 
             background.paste(img, (-350, -950), img)
-            background.save(finalName_png,"PNG")
+            background.save(self.final_png,"PNG")
             return ('done')
 
         except:
-            return('HLEngine:An issue with the camera or params passed')
-
+            return('HLEngine:An issue with the camera or params passed')    
+    
 class Speech_Recognition_Tool:
     def sR():
         try:
@@ -667,71 +605,83 @@ class Speech_Recognition_Tool:
         return (blob1.sentiment.polarity)
 
 class Weather_Station:
-    def temp(place):
+    def __init__(self,place):
+        self.place=place
+
+    def temp(self):
         owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(place)
+        observation = owm.weather_at_place(self.place)
         weather = observation.get_weather()
         temperature=str(weather.get_temperature('celsius')['temp'])
         return (temperature)
 
-    def sunrise(place):
+    def sunrise(self):
         owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(place)
+        observation = owm.weather_at_place(self.place)
         weather = observation.get_weather()
         sunriseTime=str(weather.get_sunrise_time(timeformat='iso'))
         return (sunriseTime)
 
-    def sunset(place):
+    def sunset(self):
         owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(place)
+        observation = owm.weather_at_place(self.place)
         weather = observation.get_weather()
         sunsetTime=weather.get_sunset_time(timeformat='iso')
         return (sunsetTime)
 
-    def humidity(place):
+    def humidity(self):
         owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(place)
+        observation = owm.weather_at_place(self.place)
         weather = observation.get_weather()
         return (weather.get_humidity())
 
-    def wind(place):
+    def wind(self):
         owm = pyowm.OWM('f8c43bbd601d39c177afabec2d050d04')
-        observation = owm.weather_at_place(place)
+        observation = owm.weather_at_place(self.place)
         weather = observation.get_weather()
         return (weather.get_wind())
 
 class WIKI:
-    def wiki(param):
+
+    def __init__(self,word):
+        self.word=word
+
+    def wiki(self):
         try:
-            return(wikipedia.summary(param))
+            return(wikipedia.summary(self.word))
         except:
             return ("HLEngine:error in executing wiki....")
 
 class WordExtractor:
-    def FW(param):
+
+    def __init__(self,param,location):
+        self.param=param
+        self.location=location
+
+    def FW(self):
         try:
-            sent=str(param)
+            sent=str(self.param)
             first, *middle, last = sent.split()
             #print(first, last)
             return(first)
         except:
             return("HLEngine:Error in excuting FW.....")
 
-    def EW(param):
+    def EW(self):
         try:
-            sent=str(param)
+            sent=str(self.param)
             first, *middle, last = sent.split()
             #print(first, last)
             return(last)
         except:
             return ("HLEngine:error in executing EW....")
 
-    def Image_decode(location):
+    def Image_decode(self):
         try:
             from PIL import Image, ImageEnhance, ImageFilter
             import pytesseract
             import os
-            path = location
+            path = self.location
             img = Image.open(path)
             img = img.convert('RGBA')
             pix = img.load()
@@ -742,10 +692,14 @@ class WordExtractor:
             return ("HLEngine:File missing...contact HLadmin")
 
 class XML_Parser:
-    def sysArch(question):
+
+    def __init__(self,question):
+        self.question=question
+        
+    def sysArch(self):
         mydoc = minidom.parse('HL_HiveMind/HL_HiveMind_Hub.xml')
         sources = mydoc.getElementsByTagName('source')
-        first, *middle, last = question.split()
+        first, *middle, last = self.question.split()
         for elem in sources:
             x = elem.firstChild.data
             if (x == str(last)):
